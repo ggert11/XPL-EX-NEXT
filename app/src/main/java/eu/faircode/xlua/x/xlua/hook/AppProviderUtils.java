@@ -195,6 +195,21 @@ public class AppProviderUtils {
                     .whereColumn(AssignmentPacket.FIELD_USER, end, "<=")
                     .asSnake()
                     .queryAs(AssignmentPacket.class, true, true)));
+
+            if(userId > 0) {
+                // PATCH A (work-profile fix): assignments are written keyed by the resolved
+                // bare userId (AssignmentApi -> resolveUserID), which for secondary users
+                // falls OUTSIDE the UID range [start..end] queried above. Also fetch rows
+                // keyed by the exact userId so those restrictions render in the app list.
+                // For user 0 the bare key (0) is already inside [start..end]; the gate
+                // avoids duplicates.
+                ListUtil.addAll(assignments, filterAssignments(SQLSnake
+                        .create(database, AssignmentPacket.TABLE_NAME)
+                        .onlyReturn(AssignmentPacket.FIELD_USER, AssignmentPacket.FIELD_CATEGORY, AssignmentPacket.FIELD_HOOK, AssignmentPacket.FIELD_INSTALLED, AssignmentPacket.FIELD_USED, AssignmentPacket.FIELD_RESTRICTED, AssignmentPacket.FIELD_EXCEPTION)
+                        .whereColumn(AssignmentPacket.FIELD_USER, userId)
+                        .asSnake()
+                        .queryAs(AssignmentPacket.class, true, true)));
+            }
         }
 
         if(DebugUtil.isDebug())

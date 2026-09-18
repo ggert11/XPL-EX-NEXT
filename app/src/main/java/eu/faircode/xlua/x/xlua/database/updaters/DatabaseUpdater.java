@@ -1,5 +1,7 @@
 package eu.faircode.xlua.x.xlua.database.updaters;
 
+import eu.faircode.xlua.x.xlua.hook.GroupPacket;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
@@ -613,6 +615,13 @@ public class DatabaseUpdater<T extends IIdentifiableObject & ICursorType & IJson
 
             if(database.isXLua()) {
                 try {
+                    // PATCH B (groups-table fix): runtime code (AssignmentApi group
+                    // deletes) and XDatabaseMapper reference a "groups" table described
+                    // by GroupPacket.TABLE_INFO, but no live init path creates it
+                    // (XDatabaseMapper.clean is unreached; GlobalDatabaseResolver was
+                    // cut from init). Ensure it here, in the guaranteed init step.
+                    // prepareDatabase = create-if-missing; schema comes from TABLE_INFO.
+                    DatabaseHelpEx.prepareDatabase(database, GroupPacket.TABLE_INFO);
                     //Just have it so the main fucking legacy item has a function like "readFromOld(Cursor c)" or something
                     //And have a function "ensureTableIsMoved(From, To)
 

@@ -33,6 +33,7 @@ public final class ModuleUpdateChecker {
     private ModuleUpdateChecker() { }
 
     public static void check(Activity activity) {
+        if(true) return; // PATCH C: phone-home update check disabled in this build
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
         long now = System.currentTimeMillis();
         if(now - preferences.getLong(PREF_LAST_CHECK, 0L) < CHECK_INTERVAL_MS)
