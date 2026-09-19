@@ -234,6 +234,7 @@ public class AppProviderUtils {
                             app.uid,
                             assignment.getUserId(true),
                             appUserId));
+                continue; // PATCH E: skip foreign-user rows (bare-keyed secondary-user rows fall inside user 0's UID range and must not attach to this profile's apps)
             }
 
             XHook hook = XLegacyCore.getHook(
